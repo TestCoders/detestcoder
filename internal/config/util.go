@@ -1,4 +1,4 @@
-package app
+package config
 
 import (
 	"errors"
@@ -37,7 +37,7 @@ func ReadConfig() {
 
 // WriteConfig writes the chosen settings to a .detestcoder.yaml file in the users' home directory
 // NOTE: any subsequent call to this will overwrite existing settings
-func WriteConfig() {
+func WriteConfig() error {
 	home, err := os.UserHomeDir()
 	cobra.CheckErr(err)
 
@@ -56,29 +56,31 @@ func WriteConfig() {
 	// Workaround for creating a config file if it doesn't exist
 	if err := viper.SafeWriteConfig(); err != nil {
 		if os.IsNotExist(err) {
-			cobra.CheckErr(viper.WriteConfig())
+			return viper.WriteConfig()
 		}
 	}
+
+	return nil
 }
 
 // getUserInput uses an interactive prompt to retrieve settings input from the user
 func getUserInput() UserConfig {
 	modelPrompt := configPrompt{
-		label:    "Which model do you want to use?",
+		label:    "Which model do you want to use? ",
 		errorMsg: "Select a model",
 	}
 	model := getUserInputSelect(modelPrompt, models)
 
 	modelVersionPrompt := configPrompt{
-		label:    fmt.Sprintf("Which version of '%v' would you like to use?", model),
+		label:    fmt.Sprintf("Which version of '%v' would you like to use? ", model),
 		errorMsg: "Provide a version",
 	}
-	modelVersion := getUserInputString(modelVersionPrompt, true)
+	modelVersion := getUserInputString(modelVersionPrompt, true, false)
 
 	apiKeyPrompt := configPrompt{
 		label: fmt.Sprintf("Provide your '%v' API key ", model),
 	}
-	apiKey := getUserInputString(apiKeyPrompt, false)
+	apiKey := getUserInputString(apiKeyPrompt, false, true)
 
 	return UserConfig{
 		ApiKey:       apiKey,
@@ -88,7 +90,7 @@ func getUserInput() UserConfig {
 }
 
 // getUserInputSelect creates a prompt where the user can provide textual input.
-func getUserInputString(cp configPrompt, allowEmpty bool) string {
+func getUserInputString(cp configPrompt, allowEmpty, mask bool) string {
 	validate := func(input string) error {
 		if !allowEmpty && len(input) <= 0 {
 			return errors.New(cp.errorMsg)
@@ -107,10 +109,19 @@ func getUserInputString(cp configPrompt, allowEmpty bool) string {
 		FuncMap:         nil,
 	}
 
+	var maskRune rune
+
+	if mask {
+		maskRune = '*'
+	} else {
+		maskRune = 0
+	}
+
 	prompt := promptui.Prompt{
 		Label:     cp.label,
 		Templates: templates,
 		Validate:  validate,
+		Mask:      maskRune,
 	}
 
 	result, err := prompt.Run()
