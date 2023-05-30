@@ -3,9 +3,10 @@ package file
 import (
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 )
 
-func processFiles(sourceFile, testFile string) error {
+func ProcessFiles(sourceFile, testFile string) error {
 	sourceContent, err := readFile(sourceFile)
 	if err != nil {
 		fmt.Printf("Failed to read source file: %v\n", err)
@@ -23,13 +24,18 @@ func processFiles(sourceFile, testFile string) error {
 
 	result := aiAnalyze(sourceContent, testContent)
 
-	err = writeFile("result.txt", result)
+	outputFile := ""
+	if testFile != "" {
+		outputFile = filepath.Dir(testFile) + "/AI-" + filepath.Base(testFile)
+	} else {
+		outputFile = filepath.Dir(sourceFile) + "/AI-" + filepath.Base(sourceFile)
+	}
+
+	err = writeFile(outputFile, result)
 	if err != nil {
 		fmt.Printf("Failed to write result file: %v\n", err)
 		return err
 	}
-
-	fmt.Println("Analysis completed successfully. Result written to result.txt.")
 	return nil
 }
 
@@ -43,11 +49,10 @@ func readFile(filepath string) (string, error) {
 
 func aiAnalyze(sourceContent, testContent string) string {
 	// Perform AI analysis on the source and test content
-	// Replace this with your actual implementation
-
-	analysisResult := "This is the analysis result."
-
-	return analysisResult
+	if testContent != "" {
+		return testContent
+	}
+	return sourceContent
 }
 
 func writeFile(filepath, content string) error {
