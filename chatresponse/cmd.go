@@ -70,7 +70,7 @@ func main() {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer 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") // Replace with your actual API key
+	req.Header.Set("Authorization", "Bearer API KEY") // Replace with your actual API key
 
 	resp, err := client.Do(req)
 	if err != nil {
