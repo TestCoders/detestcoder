@@ -1,17 +1,14 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
-package cmd
+package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/spf13/cobra"
 )
 
 // Struct to represent the API request payload
@@ -35,35 +32,21 @@ type GPTResponse struct {
 	} `json:"choices"`
 }
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:   "chatgpt",
-	Short: "Commandline prompter for chatgpt",
-	Long: `This is a commandline tool to send prompts and receive responses from chatGPT
-	
-	Make sure you have set an environment variable OPENAI_API_KEY containing your API key 
-	and provide a prompt as a commandline argument`,
-	Run: runCommand,
-}
-
-func runCommand(cmd *cobra.Command, args []string) {
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
-		fmt.Println("Please set the OPENAI_API_KEY environment variable.")
-		os.Exit(1)
-	}
+func main() {
+	// Parse command-line arguments
+	flag.Parse()
+	args := flag.Args()
 
 	if len(args) == 0 {
 		fmt.Println("Please provide a prompt.")
 		os.Exit(1)
 	}
-	prompt := args[0]
 
 	// Construct the API request payload
 	requestPayload := OpenAIRequest{
 		Model: "gpt-3.5-turbo",
 		Messages: []OpenAIMessage{
-			{Role: "user", Content: prompt},
+			{Role: "user", Content: args[0]},
 		},
 		MaxTokens: "32",
 	}
@@ -87,7 +70,7 @@ func runCommand(cmd *cobra.Command, args []string) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	req.Header.Set("Authorization", "Bearer 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") // Replace with your actual API key
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -97,20 +80,12 @@ func runCommand(cmd *cobra.Command, args []string) {
 	defer resp.Body.Close()
 
 	// Read the API response
-	// responseBody := ioutil.ReadAll
-	// fmt.Println("response", responseBody)
-}
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading API response:", err)
+		os.Exit(1)
+	}
 
-func init() {
-	rootCmd.AddCommand(initCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// initCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Print the entire API response
+	fmt.Println(string(responseBody))
 }
