@@ -1,6 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
+Copyright © 2023 TestCoders, deTesters, TechChamps
 */
 package cmd
 
@@ -13,13 +12,16 @@ import (
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Create initial config file with important details of your application.",
+	Long: `Create initial config file with important details of your application.
+The content of this file is based on your dependecy file.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+It will output the following content:
+- Programming language used in the application.
+- Framework(s) utilized in the application.
+- Unit test framework used, if any.
+- Any other unit test plugins or dependencies mentioned in the file.`,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("init called")
 	},
