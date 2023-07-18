@@ -27,7 +27,7 @@ type OpenAIResponse struct {
 
 func main() {
 	// Set your OpenAI API key
-	apiKey := "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"
+	apiKey := "INPUT API KEY"
 
 	// Set the API endpoint
 	apiURL := "https://api.openai.com/v1/chat/completions"
