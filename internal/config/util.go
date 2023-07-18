@@ -1,12 +1,17 @@
 package config
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"io/ioutil"
+	"net/http"
 	"os"
+	"time"
 )
 
 var models = []string{"OpenAI"}
@@ -22,6 +27,27 @@ type configPrompt struct {
 	errorMsg string
 }
 
+// Struct to represent the API request payload
+type OpenAIMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+type OpenAIRequest struct {
+	Model     string          `json:"model"`
+	Messages  []OpenAIMessage `json:"messages"`
+	MaxTokens string          `json:"max_tokens"`
+}
+
+// Struct to represent the API response payload
+type GPTResponse struct {
+	Choices []struct {
+		Message struct {
+			Content string `json:"content"`
+		} `json:"message"`
+	} `json:"choices"`
+}
+
 // ReadConfig loads the .detestcoder.yaml config file from the users' home directory
 func ReadConfig() {
 	home, err := os.UserHomeDir()
@@ -33,6 +59,7 @@ func ReadConfig() {
 	viper.AutomaticEnv()
 
 	cobra.CheckErr(viper.ReadInConfig())
+	fmt.Println(viper.Get("api_key"))
 }
 
 // WriteConfig writes the chosen settings to a .detestcoder.yaml file in the users' home directory
@@ -150,4 +177,64 @@ func getUserInputSelect(cp configPrompt, items []string) string {
 
 	cobra.CheckErr(err)
 	return result
+}
+
+func PromptInit() error {
+	ReadConfig()
+	apiKey := viper.GetString("api_key")
+
+	promptInput := configPrompt{
+		label:    fmt.Sprintf("Input your prompt "),
+		errorMsg: "Provide a version",
+	}
+
+	prompt := getUserInputString(promptInput, false, false)
+
+	// Construct the API request payload
+	requestPayload := OpenAIRequest{
+		Model: "gpt-3.5-turbo",
+		Messages: []OpenAIMessage{
+			{Role: "user", Content: prompt},
+		},
+		MaxTokens: "32",
+	}
+
+	// Convert the request payload to JSON
+	requestBody, err := json.Marshal(requestPayload)
+	if err != nil {
+		fmt.Println("Error marshaling JSON:", err)
+		os.Exit(1)
+	}
+
+	// Create an HTTP client and send the request to the ChatGPT API
+	client := http.Client{
+		Timeout: time.Second * 10,
+	}
+	apiURL := "https://api.openai.com/v1/chat/completions"
+	req, err := http.NewRequest(http.MethodPost, apiURL, bytes.NewBuffer(requestBody))
+	if err != nil {
+		fmt.Println("Error creating API request:", err)
+		os.Exit(1)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending API request:", err)
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+
+	// Read the API response
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading API response:", err)
+		os.Exit(1)
+	}
+
+	// Print the entire API response
+	fmt.Println(string(responseBody))
+	return nil
 }
