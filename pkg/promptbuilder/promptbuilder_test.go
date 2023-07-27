@@ -3,7 +3,7 @@ package promptbuilder
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcoders/detestcoder/pkg/constants"
+	"github.com/testcoders/detestcoder/pkg/constants/promptConstants"
 	"testing"
 )
 
@@ -17,58 +17,64 @@ func TestNewPromptBuilder(t *testing.T) {
 func TestAddProgrammingLanguage(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddProgrammingLanguage("Go")
-	assert.Equal(t, "Go", pb.variables[constants.ProgrammingLanguage])
+	assert.Equal(t, "Go", pb.variables[promptConstants.ProgrammingLanguage])
 }
 
 func TestAddProgrammingLanguageVersion(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddProgrammingLanguageVersion("1.20")
-	assert.Equal(t, "1.20", pb.variables[constants.ProgrammingLanguageVersion])
+	assert.Equal(t, "1.20", pb.variables[promptConstants.ProgrammingLanguageVersion])
+}
+
+func TestDependencyManager(t *testing.T) {
+	pb := NewPromptBuilder()
+	pb.AddDependencyManager("Maven")
+	assert.Equal(t, "Maven", pb.variables[promptConstants.DependencyManager])
 }
 
 func TestAddFrameworks(t *testing.T) {
 	pb := NewPromptBuilder()
-	pb.AddFrameworks([]string{"cobra"})
-	assert.Equal(t, "cobra", pb.variables[constants.Frameworks])
+	pb.AddFrameworks("cobra")
+	assert.Equal(t, "cobra", pb.variables[promptConstants.Frameworks])
 }
 
 func TestAddUnitTestFramework(t *testing.T) {
 	pb := NewPromptBuilder()
-	pb.AddUnitTestFramework("testify")
-	assert.Equal(t, "testify", pb.variables[constants.TestFramework])
+	pb.AddTestFramework("testify")
+	assert.Equal(t, "testify", pb.variables[promptConstants.TestFramework])
 }
 
-func TestAddUnitTestDependencies(t *testing.T) {
+func TestAddTestDependencies(t *testing.T) {
 	pb := NewPromptBuilder()
-	pb.AddUnitTestDependencies([]string{"testify"})
-	assert.Equal(t, "testify", pb.variables[constants.TestDependencies])
+	pb.AddTestDependencies("testify")
+	assert.Equal(t, "testify", pb.variables[promptConstants.TestDependencies])
 }
 
 func TestAddCodeSnippet(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddCodeSnippet("func testFunc() {}")
-	assert.Equal(t, "func testFunc() {}", pb.variables[constants.CodeSnippet])
+	assert.Equal(t, "func testFunc() {}", pb.variables[promptConstants.CodeSnippet])
 }
 
 func TestAddCodeSnippetContext(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddCodeSnippetContext("A test function")
-	assert.Equal(t, "A test function", pb.variables[constants.CodeSnippetContext])
+	assert.Equal(t, "A test function", pb.variables[promptConstants.CodeSnippetContext])
 }
 
 func TestAddKindOfTest(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddKindOfTest("Unit test")
-	assert.Equal(t, "Unit test", pb.variables[constants.KindOfTest])
+	assert.Equal(t, "Unit test", pb.variables[promptConstants.KindOfTest])
 }
 
 func TestBuild(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddProgrammingLanguage("Go")
 	pb.AddProgrammingLanguageVersion("1.20")
-	pb.AddFrameworks([]string{"cobra"})
-	pb.AddUnitTestFramework("testify")
-	pb.AddUnitTestDependencies([]string{"testify"})
+	pb.AddFrameworks("cobra")
+	pb.AddTestFramework("testify")
+	pb.AddTestDependencies("testify")
 	pb.AddCodeSnippet("func testFunc() {}")
 	pb.AddCodeSnippetContext("A test function")
 	pb.AddKindOfTest("Unit test")
