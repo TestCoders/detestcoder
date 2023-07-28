@@ -89,6 +89,8 @@ func TestGenerateCmd_UnitTestFlag(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	fmt.Println(out)
+
 	assert.Contains(t, out, "Generating unit tests for file: testfile")
 	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
 	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
@@ -137,7 +139,7 @@ func TestGenerateCmd_E2ETestFlag(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	assert.Contains(t, out, "Generating e2e tests for file: testfile")
+	assert.Contains(t, out, "Generating end-to-end tests for file: testfile")
 	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
 	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
 	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))

@@ -1,4 +1,4 @@
-package kindoftests
+package testType
 
 const (
 	UT  = "unit_test"

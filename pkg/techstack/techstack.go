@@ -2,7 +2,6 @@ package techstack
 
 import (
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -33,15 +32,8 @@ type TechStack struct {
 }
 
 func GetCurrentTechStack() *TechStack {
-	// Open the file
-	f, err := os.Open(".techstack")
-	if err != nil {
-		log.Fatalf("error: %v", err)
-	}
-	defer f.Close()
-
 	// Read the file's content
-	bytes, err := ioutil.ReadAll(f)
+	bytes, err := os.ReadFile(".techstack")
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -65,7 +57,7 @@ func WriteCurrentTechStack(ts *TechStack) {
 	}
 
 	// Write the YAML to the .techstack.template file
-	err = ioutil.WriteFile(".techstack", bytes, 0644)
+	err = os.WriteFile(".techstack", bytes, 0644)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
