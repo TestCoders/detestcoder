@@ -7,11 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/testcoders/detestcoder/cmd"
 	"github.com/testcoders/detestcoder/pkg/techstack"
+	"log"
 	"os"
 	"testing"
 )
 
 func setup() *techstack.TechStack {
+	createTempTestfile("testfile.java")
+
 	ts := techstack.NewTechStack()
 	ts.SetDependencyManager("Maven", "3")
 	ts.SetLanguage("Java", "20")
@@ -23,8 +26,33 @@ func setup() *techstack.TechStack {
 	return ts
 }
 
+func createTempTestfile(testfile string) {
+	content := []byte(`
+		Iterator<Map<String, Object>> feeder =
+  			Stream.generate((Supplier<Map<String, Object>>) () -> {
+      		String email = RandomStringUtils.randomAlphanumeric(20) + "@foo.com";
+      		return Collections.singletonMap("email", email);
+			}
+		).iterator();`)
+	err := os.WriteFile(testfile, content, 0644)
+	if err != nil {
+		log.Fatalf("Failed to create file: %s", err)
+	}
+}
+
 func teardown() {
-	os.Remove(".techstack")
+	err := os.Remove(".techstack")
+	if err != nil {
+		log.Fatalf("Failed to remove .techstack: %v", err)
+	}
+	err = os.Remove("testfile.java")
+	if err != nil {
+		log.Fatalf("Failed to remove testfile.java: %v", err)
+	}
+	err = os.RemoveAll("generatedPrompts")
+	if err != nil {
+		log.Fatalf("Failed to remove the generatedPrompts directory: %v", err)
+	}
 }
 
 func captureOutput(f func()) string {
@@ -58,14 +86,14 @@ func TestGenerateCmd_NoFlags(t *testing.T) {
 	rootCmd.AddCommand(cmd.NewGenerateCmd())
 
 	// Set the file argument
-	rootCmd.SetArgs([]string{"generate", "testfile", "A file to test the test"})
+	rootCmd.SetArgs([]string{"generate", "testfile.java", "A file to test the test"})
 
 	out := captureOutput(func() {
 		err := rootCmd.Execute()
 		assert.NoError(t, err)
 	})
 
-	assert.Contains(t, out, "No flags provided, defaulting to unit test for file: testfile")
+	assert.Contains(t, out, "No flags provided, defaulting to unit test for file: testfile.java")
 	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
 	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
 	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
@@ -82,16 +110,14 @@ func TestGenerateCmd_UnitTestFlag(t *testing.T) {
 	rootCmd.AddCommand(cmd.NewGenerateCmd())
 
 	// Set the file argument
-	rootCmd.SetArgs([]string{"generate", "testfile", "--unittest"})
+	rootCmd.SetArgs([]string{"generate", "testfile.java", "--unittest"})
 
 	out := captureOutput(func() {
 		err := rootCmd.Execute()
 		assert.NoError(t, err)
 	})
 
-	fmt.Println(out)
-
-	assert.Contains(t, out, "Generating unit tests for file: testfile")
+	assert.Contains(t, out, "Generating unit tests for file: testfile.java")
 	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
 	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
 	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
@@ -108,14 +134,14 @@ func TestGenerateCmd_IntegrationTestFlag(t *testing.T) {
 	rootCmd.AddCommand(cmd.NewGenerateCmd())
 
 	// Set the file argument
-	rootCmd.SetArgs([]string{"generate", "testfile", "--integrationtest"})
+	rootCmd.SetArgs([]string{"generate", "testfile.java", "--integrationtest"})
 
 	out := captureOutput(func() {
 		err := rootCmd.Execute()
 		assert.NoError(t, err)
 	})
 
-	assert.Contains(t, out, "Generating integration tests for file: testfile")
+	assert.Contains(t, out, "Generating integration tests for file: testfile.java")
 	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
 	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
 	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
@@ -132,14 +158,14 @@ func TestGenerateCmd_E2ETestFlag(t *testing.T) {
 	rootCmd.AddCommand(cmd.NewGenerateCmd())
 
 	// Set the file argument
-	rootCmd.SetArgs([]string{"generate", "testfile", "--e2etest"})
+	rootCmd.SetArgs([]string{"generate", "testfile.java", "--e2etest"})
 
 	out := captureOutput(func() {
 		err := rootCmd.Execute()
 		assert.NoError(t, err)
 	})
 
-	assert.Contains(t, out, "Generating end-to-end tests for file: testfile")
+	assert.Contains(t, out, "Generating e2e tests for file: testfile.java")
 	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
 	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
 	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))

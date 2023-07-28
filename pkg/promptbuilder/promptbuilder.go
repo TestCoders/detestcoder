@@ -6,7 +6,7 @@ import (
 )
 
 const basePrompt = "" +
-	"You are an experienced test automation engineer. I need you to help me write {" + promptConstants.TestType + "}s for the following code snippet from my project:\n\n" +
+	"You are an experienced test automation engineer. I need you to help me write {" + promptConstants.TestType + "}s for the following {" + promptConstants.ProgrammingLanguage + "} code snippet from my project:\n\n" +
 	"{" + promptConstants.CodeSnippet + "}\n\n" +
 	"This code has the following context: {" + promptConstants.CodeSnippetContext + "}\n\n" +
 	"The code is written in {" + promptConstants.ProgrammingLanguage + "} with version {" + promptConstants.ProgrammingLanguageVersion + "}.\n\n" +

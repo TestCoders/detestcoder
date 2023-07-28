@@ -21,3 +21,10 @@
 go.work
 
 dist/
+
+# detestcoders specific folders
+generatedPrompts
+testfiles
+main
+detestcoder
+.techstack
