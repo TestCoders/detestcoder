@@ -1,13 +1,12 @@
 package promptbuilder
 
 import (
-	"fmt"
 	"github.com/testcoders/detestcoder/pkg/constants/promptConstants"
 	"strings"
 )
 
 const basePrompt = "" +
-	"You are an experienced test automation engineer. I need you to help me write {" + promptConstants.KindOfTest + "}s for the following code snippet from my project:\n\n" +
+	"You are an experienced test automation engineer. I need you to help me write {" + promptConstants.TestType + "}s for the following {" + promptConstants.ProgrammingLanguage + "} code snippet from my project:\n\n" +
 	"{" + promptConstants.CodeSnippet + "}\n\n" +
 	"This code has the following context: {" + promptConstants.CodeSnippetContext + "}\n\n" +
 	"The code is written in {" + promptConstants.ProgrammingLanguage + "} with version {" + promptConstants.ProgrammingLanguageVersion + "}.\n\n" +
@@ -62,7 +61,7 @@ func (p *PromptBuilder) AddCodeSnippetContext(value string) {
 }
 
 func (p *PromptBuilder) AddKindOfTest(value string) {
-	p.addVariable(promptConstants.KindOfTest, value)
+	p.addVariable(promptConstants.TestType, value)
 }
 
 func (p *PromptBuilder) addVariable(key, value string) {
@@ -70,12 +69,27 @@ func (p *PromptBuilder) addVariable(key, value string) {
 }
 
 func (p *PromptBuilder) Build() string {
-	result := p.basePrompt
+	var result strings.Builder
 
-	for key, value := range p.variables {
-		placeholder := fmt.Sprintf("{%s}", key)
-		result = strings.Replace(result, placeholder, value, -1)
+	last := 0
+	for start := 0; start < len(p.basePrompt); start++ {
+		if p.basePrompt[start] == '{' {
+			end := strings.IndexByte(p.basePrompt[start:], '}')
+			if end < 0 {
+				break
+			}
+			end += start
+
+			key := p.basePrompt[start+1 : end]
+			value, ok := p.variables[key]
+			if ok {
+				result.WriteString(p.basePrompt[last:start])
+				result.WriteString(value)
+				last = end + 1
+			}
+		}
 	}
+	result.WriteString(p.basePrompt[last:])
 
-	return result
+	return result.String()
 }

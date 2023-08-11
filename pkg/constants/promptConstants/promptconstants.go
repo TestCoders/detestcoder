@@ -9,5 +9,5 @@ const (
 	TestDependencies           = "test_dependencies"
 	CodeSnippet                = "code_snippet"
 	CodeSnippetContext         = CodeSnippet + "_context"
-	KindOfTest                 = "kind_of_test"
+	TestType                   = "test_type"
 )

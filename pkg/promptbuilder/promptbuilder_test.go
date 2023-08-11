@@ -65,7 +65,7 @@ func TestAddCodeSnippetContext(t *testing.T) {
 func TestAddKindOfTest(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddKindOfTest("Unit test")
-	assert.Equal(t, "Unit test", pb.variables[promptConstants.KindOfTest])
+	assert.Equal(t, "Unit test", pb.variables[promptConstants.TestType])
 }
 
 func TestBuild(t *testing.T) {
@@ -75,6 +75,7 @@ func TestBuild(t *testing.T) {
 	pb.AddFrameworks("cobra")
 	pb.AddTestFramework("testify")
 	pb.AddTestDependencies("testify")
+	pb.AddDependencyManager("Go mod")
 	pb.AddCodeSnippet("func testFunc() {}")
 	pb.AddCodeSnippetContext("A test function")
 	pb.AddKindOfTest("Unit test")
@@ -87,6 +88,7 @@ func TestBuild(t *testing.T) {
 	assert.Contains(t, result, "1.20")
 	assert.Contains(t, result, "cobra")
 	assert.Contains(t, result, "testify")
+	assert.Contains(t, result, "Go mod")
 	assert.Contains(t, result, "func testFunc() {}")
 	assert.Contains(t, result, "A test function")
 	assert.Contains(t, result, "Unit test")

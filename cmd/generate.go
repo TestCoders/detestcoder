@@ -3,10 +3,13 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/testcoders/detestcoder/pkg/constants/kindoftests"
+	"github.com/testcoders/detestcoder/pkg/constants/testType"
 	"github.com/testcoders/detestcoder/pkg/promptbuilder"
 	"github.com/testcoders/detestcoder/pkg/techstack"
+	"log"
+	"os"
 	"strings"
+	"time"
 )
 
 var unitTest bool
@@ -28,7 +31,6 @@ var generateCmd = &cobra.Command{
 		ts := techstack.GetCurrentTechStack()
 
 		pb := promptbuilder.NewPromptBuilder()
-		pb.AddCodeSnippet(file) // TODO: func for readValueOfFile
 
 		var codeSnippetContext string
 		if len(args) > 1 {
@@ -38,21 +40,23 @@ var generateCmd = &cobra.Command{
 
 		if cmd.Flags().NFlag() == 0 {
 			fmt.Printf("No flags provided, defaulting to unit test for file: %s\n", file)
-			pb.AddKindOfTest(kindoftests.UT)
+			pb.AddKindOfTest(testType.UT)
 		} else {
 			if unitTest {
 				fmt.Printf("Generating unit tests for file: %s\n", file)
-				pb.AddKindOfTest(kindoftests.UT)
+				pb.AddKindOfTest(testType.UT)
 			}
 			if integrationTest {
 				fmt.Printf("Generating integration tests for file: %s\n", file)
-				pb.AddKindOfTest(kindoftests.IT)
+				pb.AddKindOfTest(testType.IT)
 			}
 			if e2eTest {
 				fmt.Printf("Generating e2e tests for file: %s\n", file)
-				pb.AddKindOfTest(kindoftests.E2E)
+				pb.AddKindOfTest(testType.E2E)
 			}
 		}
+
+		readContentsOfFileAndAddCodeSnippet(pb, file)
 
 		pb.AddProgrammingLanguage(ts.TechStack.Language.Name)
 		pb.AddProgrammingLanguageVersion(ts.TechStack.Language.Version)
@@ -63,8 +67,37 @@ var generateCmd = &cobra.Command{
 
 		prompt := pb.Build()
 
+		// TODO: actually send this to OpenAI and do the magic from there...
+		writeToFile(prompt)
 		fmt.Printf(prompt)
 	},
+}
+
+func writeToFile(data string) {
+	timestamp := time.Now().Unix()
+
+	// create the directory if it doesn't exist
+	dir := "generatedPrompts/"
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		os.Mkdir(dir, 0755)
+	}
+
+	filename := fmt.Sprintf("%sprompt_%d", dir, timestamp)
+
+	err := os.WriteFile(filename, []byte(data), 0644)
+	if err != nil {
+		log.Fatalf("Failed to write to file: %v", err)
+	}
+}
+
+func readContentsOfFileAndAddCodeSnippet(pb *promptbuilder.PromptBuilder, filename string) {
+	bytes, err := os.ReadFile(filename)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	code := string(bytes)
+	pb.AddCodeSnippet(code)
 }
 
 func getTestDependencies(ts *techstack.TechStack) string {
