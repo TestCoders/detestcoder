@@ -22,9 +22,10 @@ go.work
 
 dist/
 
-# detestcoders specific folders
+# detestcoders specific files and folders
 generatedPrompts
+generatedOutput
 testfiles
 main
 detestcoder
-.techstack
+.detestcoder.yaml

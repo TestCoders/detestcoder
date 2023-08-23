@@ -14,7 +14,7 @@ import (
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize your 'detestcoder' setup",
-	Long:  "Use this command to generate a .detestcoder.yaml config file in your home directory.",
+	Long:  "Use this command to files a .detestcoder.yaml config file in your home directory.",
 	Run: func(cmd *cobra.Command, args []string) {
 		cobra.CheckErr(config.WriteConfig())
 	},

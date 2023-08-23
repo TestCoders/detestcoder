@@ -5,10 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="538d214f-bec2-42d6-8b8c-b82a55abc51c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/ai/commands.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/ai/response.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/detestcoder.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/detestcoder.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.goreleaser.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.goreleaser.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.techstack.template" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/generate.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/generate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/init.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/init.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/root.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd_test/generate_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd_test/generate_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/ai/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/ai/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/ai/commands.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/ai/commands.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/ai/response.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/ai/response.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/config/util.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/config/util.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/techstack/techstack.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/techstack/techstack.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/techstack/techstack_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/config/techstack/techstack_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,8 +32,13 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file:///opt/homebrew/Cellar/go/1.20.6/libexec" />
+  <component name="GOROOT" url="file:///opt/homebrew/opt/go/libexec" />
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GoLibraries">
@@ -33,31 +48,58 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2SkwDhiMljyim1R44Q265M9efb8" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="DefaultGoTemplateProperty" value="Go File" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="go.format.on.save.advertiser.fired" value="true" />
-    <property name="go.formatter.settings.were.checked" value="true" />
-    <property name="go.import.settings.migrated" value="true" />
-    <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
-    <property name="go.sdk.automatically.set" value="true" />
-    <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultGoTemplateProperty": "Go File",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "/Users/l.j.bouman/repo/go/detestcoder/cmd_test",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "settings.editor.selected.configurable": "go.vgo"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cmd_test" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/cmd_test/mockdata" />
+      <recent name="$PROJECT_DIR$/pkg/config" />
+      <recent name="$PROJECT_DIR$/pkg/model" />
+    </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Go Test.go test github.com/testcoders/detestcoder/cmd_test">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="detestcoder" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestGenerateCmd_NoFlags in github.com/testcoders/detestcoder/cmd_test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="detestcoder" />
+      <working_directory value="$PROJECT_DIR$/cmd_test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/testcoders/detestcoder/cmd_test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestGenerateCmd_NoFlags\E$" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
@@ -69,6 +111,57 @@
       <framework value="gotest" />
       <method v="2" />
     </configuration>
+    <configuration name="go test detestcoder" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="detestcoder" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <package value="github.com/testcoders/detestcoder" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test github.com/testcoders/detestcoder/cmd_test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="detestcoder" />
+      <working_directory value="$PROJECT_DIR$/cmd_test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/testcoders/detestcoder/cmd_test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test github.com/testcoders/detestcoder/pkg/promptbuilder" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="detestcoder" />
+      <working_directory value="$PROJECT_DIR$/pkg/promptbuilder" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="github.com/testcoders/detestcoder/pkg/promptbuilder" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <configuration name="techstack_test.go" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="detestcoder" />
+      <working_directory value="$PROJECT_DIR$/pkg/config/techstack" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/pkg/config/techstack/techstack_test.go" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go Test.go test github.com/testcoders/detestcoder/cmd_test" />
+        <item itemvalue="Go Test.TestGenerateCmd_NoFlags in github.com/testcoders/detestcoder/cmd_test" />
+        <item itemvalue="Go Test.go test detestcoder" />
+        <item itemvalue="Go Test.techstack_test.go" />
+        <item itemvalue="Go Test.go test github.com/testcoders/detestcoder/pkg/promptbuilder" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
@@ -86,6 +179,17 @@
     </option>
   </component>
   <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
+    <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/cmd_test/generate_test.go</url>
+          <line>127</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
