@@ -1,0 +1,49 @@
+{
+  "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+  "id": "56360",
+  "self": "https://foo.atlassian.net/rest/api/3/issue/56360",
+  "key": "MB-1337",
+  "fields": {
+    "description": {
+      "version": 1,
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "The "
+            },
+            {
+              "type": "text",
+              "text": "read_file",
+              "marks": [
+                {
+                  "type": "code"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " function in "
+            },
+            {
+              "type": "text",
+              "text": "file_utils.py",
+              "marks": [
+                {
+                  "type": "code"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " uses demo text to provide test data"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
