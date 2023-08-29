@@ -2,36 +2,44 @@ package cmd_test
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcoders/detestcoder/cmd"
-	"github.com/testcoders/detestcoder/pkg/techstack"
+	"github.com/testcoders/detestcoder/pkg/config/aimodel"
+	"github.com/testcoders/detestcoder/pkg/config/techstack"
+	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"testing"
 )
 
-func setup() *techstack.TechStack {
+func setup() {
 	createTempTestfile("testfile.java")
+
+	am := aimodel.NewAiModel()
+	am.SetModel("Mock")
+	am.SetModelVersion("4")
+	am.SetApiKey("12345678")
+
+	createTempDetestcoderYaml(*am)
 
 	ts := techstack.NewTechStack()
 	ts.SetDependencyManager("Maven", "3")
 	ts.SetLanguage("Java", "20")
-	ts.AddFramework("Spring Boot", "3.0")
-	ts.AddTestFramework("jUnit", "5")
+	ts.SetFramework("Spring Boot", "3.0")
+	ts.SetTestFramework("jUnit", "5")
 	ts.AddTestDependency("AssertJ", "3.1.1")
 	ts.AddTestDependency("Spring Boot Test", "3")
-	techstack.WriteCurrentTechStack(ts)
-	return ts
+
+	createTempDetestcoderProjectYaml(*ts)
 }
 
 func createTempTestfile(testfile string) {
 	content := []byte(`
 		Iterator<Map<String, Object>> feeder =
-  			Stream.generate((Supplier<Map<String, Object>>) () -> {
-      		String email = RandomStringUtils.randomAlphanumeric(20) + "@foo.com";
-      		return Collections.singletonMap("email", email);
+ 			Stream.files((Supplier<Map<String, Object>>) () -> {
+     		String email = RandomStringUtils.randomAlphanumeric(20) + "@foo.com";
+     		return Collections.singletonMap("email", email);
 			}
 		).iterator();`)
 	err := os.WriteFile(testfile, content, 0644)
@@ -40,14 +48,55 @@ func createTempTestfile(testfile string) {
 	}
 }
 
-func teardown() {
-	err := os.Remove(".techstack")
+func createTempDetestcoderProjectYaml(ts techstack.TechStack) {
+	// Marshal the ts struct into YAML
+	bytes, err := yaml.Marshal(ts)
 	if err != nil {
-		log.Fatalf("Failed to remove .techstack: %v", err)
+		log.Fatalf("error: %v", err)
+	}
+
+	// Write the YAML to the .detestcoder file
+	err = os.WriteFile(".detestcoder.project.yaml", bytes, 0644)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+}
+
+func createTempDetestcoderYaml(am aimodel.AIModel) {
+	// Marshal the ts struct into YAML
+	bytes, err := yaml.Marshal(am)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	homeDir, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+
+	// Write the YAML to the .detestcoder file
+	err = os.WriteFile(homeDir+"/.detestcoder.yaml", bytes, 0644)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+}
+
+func teardown() {
+	homeDir, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	err = os.Remove(homeDir + "/.detestcoder.yaml")
+	if err != nil {
+		log.Fatalf("Failed to remove .detestcoder.yaml: %v", err)
+	}
+	err = os.Remove(".detestcoder.project.yaml")
+	if err != nil {
+		log.Fatalf("Failed to remove .detestcoder.project.yaml: %v", err)
 	}
 	err = os.Remove("testfile.java")
 	if err != nil {
 		log.Fatalf("Failed to remove testfile.java: %v", err)
+	}
+	err = os.RemoveAll("generatedOutput")
+	if err != nil {
+		log.Fatalf("Failed to remove the generatedOutput directory: %v", err)
 	}
 	err = os.RemoveAll("generatedPrompts")
 	if err != nil {
@@ -79,7 +128,7 @@ func captureOutput(f func()) string {
 
 // Test case for default scenario where no flags are provided. The system should default to unit tests
 func TestGenerateCmd_NoFlags(t *testing.T) {
-	techStack := setup()
+	setup()
 	defer teardown()
 
 	rootCmd := &cobra.Command{}
@@ -94,16 +143,12 @@ func TestGenerateCmd_NoFlags(t *testing.T) {
 	})
 
 	assert.Contains(t, out, "No flags provided, defaulting to unit test for file: testfile.java")
-	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
-	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following test frameworks \"%s %s\" and dependencies \"%s %s, %s %s\"", techStack.TechStack.TestFramework.Name, techStack.TechStack.TestFramework.Version, techStack.TechStack.TestDependencies[0].Name, techStack.TechStack.TestDependencies[0].Version, techStack.TechStack.TestDependencies[1].Name, techStack.TechStack.TestDependencies[1].Version))
-
+	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the unit test flag is set
 func TestGenerateCmd_UnitTestFlag(t *testing.T) {
-	techStack := setup()
+	setup()
 	defer teardown()
 
 	rootCmd := &cobra.Command{}
@@ -118,16 +163,12 @@ func TestGenerateCmd_UnitTestFlag(t *testing.T) {
 	})
 
 	assert.Contains(t, out, "Generating unit tests for file: testfile.java")
-	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
-	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following test frameworks \"%s %s\" and dependencies \"%s %s, %s %s\"", techStack.TechStack.TestFramework.Name, techStack.TechStack.TestFramework.Version, techStack.TechStack.TestDependencies[0].Name, techStack.TechStack.TestDependencies[0].Version, techStack.TechStack.TestDependencies[1].Name, techStack.TechStack.TestDependencies[1].Version))
-
+	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the integration test flag is set
 func TestGenerateCmd_IntegrationTestFlag(t *testing.T) {
-	techStack := setup()
+	setup()
 	defer teardown()
 
 	rootCmd := &cobra.Command{}
@@ -142,16 +183,12 @@ func TestGenerateCmd_IntegrationTestFlag(t *testing.T) {
 	})
 
 	assert.Contains(t, out, "Generating integration tests for file: testfile.java")
-	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
-	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following test frameworks \"%s %s\" and dependencies \"%s %s, %s %s\"", techStack.TechStack.TestFramework.Name, techStack.TechStack.TestFramework.Version, techStack.TechStack.TestDependencies[0].Name, techStack.TechStack.TestDependencies[0].Version, techStack.TechStack.TestDependencies[1].Name, techStack.TechStack.TestDependencies[1].Version))
-
+	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the e2e test flag is set
 func TestGenerateCmd_E2ETestFlag(t *testing.T) {
-	techStack := setup()
+	setup()
 	defer teardown()
 
 	rootCmd := &cobra.Command{}
@@ -166,9 +203,5 @@ func TestGenerateCmd_E2ETestFlag(t *testing.T) {
 	})
 
 	assert.Contains(t, out, "Generating e2e tests for file: testfile.java")
-	assert.Contains(t, out, fmt.Sprintf("The code is written in %s with version %s.", techStack.TechStack.Language.Name, techStack.TechStack.Language.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following dependency manager (ignore this when empty): %s %s.", techStack.TechStack.DependencyManager.Name, techStack.TechStack.DependencyManager.Version))
-	assert.Contains(t, out, fmt.Sprintf("It's built using the following frameworks: %s %s", techStack.TechStack.Framework.Name, techStack.TechStack.Framework.Version))
-	assert.Contains(t, out, fmt.Sprintf("It uses the following test frameworks \"%s %s\" and dependencies \"%s %s, %s %s\"", techStack.TechStack.TestFramework.Name, techStack.TechStack.TestFramework.Version, techStack.TechStack.TestDependencies[0].Name, techStack.TechStack.TestDependencies[0].Version, techStack.TechStack.TestDependencies[1].Name, techStack.TechStack.TestDependencies[1].Version))
-
+	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
 }

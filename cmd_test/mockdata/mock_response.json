@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7qNhTFK19RRUy1Q8aayXoyJte0C2B",
+  "object": "chat.completion",
+  "created": 1692718515,
+  "model": "gpt-4-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "```java\nimport org.apache.commons.lang3.RandomStringUtils;\nimport org.junit.jupiter.api.Test;\nimport org.junit.jupiter.api.BeforeEach;\nimport org.junit.jupiter.api.AfterEach;\nimport org.junit.jupiter.api.Assertions;\nimport org.mockito.Mockito;\nimport org.springframework.boot.test.context.SpringBootTest;\n\nimport java.util.Iterator;\nimport java.util.Map;\nimport java.util.function.Supplier;\nimport java.util.stream.Stream;\n\n@SpringBootTest\npublic class FeederClassTest {\n\n    private FeederClass feederClass;\n\n    @BeforeEach\n    public void setUp() {\n        feederClass = new FeederClass();\n    }\n\n    @AfterEach\n    public void tearDown() {\n        feederClass = null;\n    }\n\n    // Test to check if the feeder iterator is not null\n    @Test\n    public void testFeederNotNull() {\n        Iterator<Map<String, Object>> feeder = Stream.generate((Supplier<Map<String, Object>>) () -> {\n            String email = RandomStringUtils.randomAlphanumeric(20) + \"@foo.com\";\n            return Collections.singletonMap(\"email\", email);\n        }).iterator();\n\n        Assertions.assertNotNull(feeder);\n    }\n\n    // Test to check if the feeder iterator has next value\n    @Test\n    public void testFeederHasNext() {\n        Iterator<Map<String, Object>> feeder = Stream.generate((Supplier<Map<String, Object>>) () -> {\n            String email = RandomStringUtils.randomAlphanumeric(20) + \"@foo.com\";\n            return Collections.singletonMap(\"email\", email);\n        }).iterator();\n\n        Assertions.assertTrue(feeder.hasNext());\n    }\n\n    // Test to check if the feeder iterator generates correct email\n    @Test\n    public void testFeederEmailGeneration() {\n        Iterator<Map<String, Object>> feeder = Stream.generate((Supplier<Map<String, Object>>) () -> {\n            String email = RandomStringUtils.randomAlphanumeric(20) + \"@foo.com\";\n            return Collections.singletonMap(\"email\", email);\n        }).iterator();\n\n        Map<String, Object> map = feeder.next();\n        Assertions.assertTrue(map.get(\"email\").toString().endsWith(\"@foo.com\"));\n    }\n}\n```\n\nPlease note that the above test cases are written assuming that the `FeederClass` is a Spring Boot component. If it's not, you might need to adjust the test setup accordingly. Also, the `RandomStringUtils` class is not mocked in these tests, so the generated emails will be different for each test run."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 287,
+    "completion_tokens": 484,
+    "total_tokens": 771
+  }
+}
