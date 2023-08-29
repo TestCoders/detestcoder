@@ -1,22 +1,18 @@
 package ai
 
-import "encoding/json"
+import (
+	"github.com/testcoders/detestcoder/pkg/config/aimodel"
+)
 
-// SendPrompt is used to send the prompt to any AI backend
-func SendPrompt(service Service) (*Response, error) {
-	// Do additional things that are backend independent here, for example
-	// validate initialize or output text to the terminal
-
+// SendPrompt is used to send the prompt to any AI backend and giving back a Response object
+func SendPrompt(service Service, model aimodel.AIModel) (*Response, error) {
 	raw, err := service.Send()
 	if err != nil {
 		return nil, err
 	}
 
 	response := new(Response)
-	err = json.Unmarshal(raw, response)
-	if err != nil {
-		return nil, err
-	}
+	response.GetResponse(raw, model)
 
 	return response, nil
 }

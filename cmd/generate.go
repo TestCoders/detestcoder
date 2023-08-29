@@ -75,18 +75,12 @@ var generateCmd = &cobra.Command{
 		pb.AddTestFramework(techStack.TestFramework.Name + " " + techStack.TestFramework.Version)
 		pb.AddTestDependencies(techstack.GetTestDependencies(*techStack))
 
-		prompt := pb.Build()
-
-		files.WritePromptToFile(prompt)
-
-		service := ai.NewService().GetService(prompt, *aiModel)
-
-		response, err := ai.SendPrompt(service)
+		response, err := ai.SendPrompt(ai.NewService().GetService(pb.Build(), *aiModel), *aiModel)
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println(response.Choices)
+		fmt.Println(response.Content)
 		files.WriteOutputToFile(*response, file)
 	},
 }

@@ -54,11 +54,9 @@ func WriteOutputToFile(response ai.Response, testFileName string) {
 	defer file.Close()
 
 	w := bufio.NewWriter(file)
-	for _, choice := range response.Choices {
-		content := choice.Message.Content
-		if _, err := w.WriteString(content + "\n\n"); err != nil {
-			log.Fatalf("Failed to write to file: %v", err)
-		}
+	content := response.Content
+	if _, err := w.WriteString(content + "\n\n"); err != nil {
+		log.Fatalf("Failed to write to file: %v", err)
 	}
 
 	if err = w.Flush(); err != nil {
