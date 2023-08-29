@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcoders/detestcoder/cmd"
-	"github.com/testcoders/detestcoder/internal/config"
 	"github.com/testcoders/detestcoder/pkg/config/aimodel"
 	"github.com/testcoders/detestcoder/pkg/config/techstack"
 	"gopkg.in/yaml.v3"
@@ -14,8 +13,15 @@ import (
 	"testing"
 )
 
-func setup() *techstack.TechStack {
+func setup() {
 	createTempTestfile("testfile.java")
+
+	am := aimodel.NewAiModel()
+	am.SetModel("Mock")
+	am.SetModelVersion("4")
+	am.SetApiKey("12345678")
+
+	createTempDetestcoderYaml(*am)
 
 	ts := techstack.NewTechStack()
 	ts.SetDependencyManager("Maven", "3")
@@ -25,19 +31,7 @@ func setup() *techstack.TechStack {
 	ts.AddTestDependency("AssertJ", "3.1.1")
 	ts.AddTestDependency("Spring Boot Test", "3")
 
-	am := aimodel.NewAiModel()
-	am.SetModel("Mock")
-	am.SetModelVersion("4")
-	am.SetApiKey("12345678")
-
-	myConfig := config.Config{
-		AIModel:   *am,
-		TechStack: *ts,
-	}
-
-	createTempDetestcoderYaml(myConfig)
-
-	return ts
+	createTempDetestcoderProjectYaml(*ts)
 }
 
 func createTempTestfile(testfile string) {
@@ -54,24 +48,47 @@ func createTempTestfile(testfile string) {
 	}
 }
 
-func createTempDetestcoderYaml(config config.Config) {
+func createTempDetestcoderProjectYaml(ts techstack.TechStack) {
 	// Marshal the ts struct into YAML
-	bytes, err := yaml.Marshal(config)
+	bytes, err := yaml.Marshal(ts)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
 	// Write the YAML to the .detestcoder file
-	err = os.WriteFile(".detestcoder", bytes, 0644)
+	err = os.WriteFile(".detestcoder.project.yaml", bytes, 0644)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+}
+
+func createTempDetestcoderYaml(am aimodel.AIModel) {
+	// Marshal the ts struct into YAML
+	bytes, err := yaml.Marshal(am)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	homeDir, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+
+	// Write the YAML to the .detestcoder file
+	err = os.WriteFile(homeDir+"/.detestcoder.yaml", bytes, 0644)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 }
 
 func teardown() {
-	err := os.Remove(".detestcoder")
+	homeDir, err := os.UserHomeDir()
+	cobra.CheckErr(err)
+	err = os.Remove(homeDir + "/.detestcoder.yaml")
 	if err != nil {
-		log.Fatalf("Failed to remove .detestcoder: %v", err)
+		log.Fatalf("Failed to remove .detestcoder.yaml: %v", err)
+	}
+	err = os.Remove(".detestcoder.project.yaml")
+	if err != nil {
+		log.Fatalf("Failed to remove .detestcoder.project.yaml: %v", err)
 	}
 	err = os.Remove("testfile.java")
 	if err != nil {

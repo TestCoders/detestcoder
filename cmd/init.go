@@ -7,16 +7,16 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/testcoders/detestcoder/internal/config"
+	"github.com/testcoders/detestcoder/internal/initialize"
 )
 
-// initCmd represents the init command
+// initCmd represents the initialize command
 var initCmd = &cobra.Command{
-	Use:   "init",
+	Use:   "initialize",
 	Short: "Initialize your 'detestcoder' setup",
-	Long:  "Use this command to files a .detestcoder.yaml config file in your home directory.",
+	Long:  "Use this command to files a .detestcoder.yaml initialize file in your home directory.",
 	Run: func(cmd *cobra.Command, args []string) {
-		cobra.CheckErr(config.WriteConfig())
+		cobra.CheckErr(initialize.WriteConfig())
 	},
 }
 

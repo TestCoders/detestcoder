@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/testcoders/detestcoder/internal/addproject"
 	"github.com/testcoders/detestcoder/internal/ai"
-	"github.com/testcoders/detestcoder/internal/config"
 	"github.com/testcoders/detestcoder/internal/files"
+	"github.com/testcoders/detestcoder/internal/initialize"
 	"github.com/testcoders/detestcoder/pkg/config/techstack"
 	"github.com/testcoders/detestcoder/pkg/constants/testType"
 	"github.com/testcoders/detestcoder/pkg/promptbuilder"
@@ -27,14 +28,17 @@ var generateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		file := args[0]
 
-		myConfig, err := config.ReadConfig() // Assuming ReadConfig is in the config package
+		aiModel, err := initialize.ReadConfig()
 		if err != nil {
-			fmt.Printf("Failed to read config: %v", err)
+			fmt.Printf("Failed to read initialize: %v", err)
 			return
 		}
 
-		aiModel := myConfig.AIModel
-		techStack := myConfig.TechStack
+		techStack, err := addproject.ReadConfig()
+		if err != nil {
+			fmt.Printf("Failed to read initialize: %v", err)
+			return
+		}
 
 		pb := promptbuilder.NewPromptBuilder()
 
@@ -69,13 +73,13 @@ var generateCmd = &cobra.Command{
 		pb.AddDependencyManager(techStack.DependencyManager.Name + " " + techStack.DependencyManager.Version)
 		pb.AddFrameworks(techStack.Framework.Name + " " + techStack.Framework.Version)
 		pb.AddTestFramework(techStack.TestFramework.Name + " " + techStack.TestFramework.Version)
-		pb.AddTestDependencies(techstack.GetTestDependencies(techStack))
+		pb.AddTestDependencies(techstack.GetTestDependencies(*techStack))
 
 		prompt := pb.Build()
 
 		files.WritePromptToFile(prompt)
 
-		service := ai.NewService().GetService(prompt, aiModel)
+		service := ai.NewService().GetService(prompt, *aiModel)
 
 		response, err := ai.SendPrompt(service)
 		if err != nil {

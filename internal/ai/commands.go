@@ -5,7 +5,7 @@ import "encoding/json"
 // SendPrompt is used to send the prompt to any AI backend
 func SendPrompt(service Service) (*Response, error) {
 	// Do additional things that are backend independent here, for example
-	// validate config or output text to the terminal
+	// validate initialize or output text to the terminal
 
 	raw, err := service.Send()
 	if err != nil {
