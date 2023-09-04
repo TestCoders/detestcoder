@@ -38,12 +38,6 @@ func TestAddFrameworks(t *testing.T) {
 	assert.Equal(t, "cobra", pb.variables[promptConstants.Frameworks])
 }
 
-func TestAddUnitTestFramework(t *testing.T) {
-	pb := NewPromptBuilder()
-	pb.AddTestFramework("testify")
-	assert.Equal(t, "testify", pb.variables[promptConstants.TestFramework])
-}
-
 func TestAddTestDependencies(t *testing.T) {
 	pb := NewPromptBuilder()
 	pb.AddTestDependencies("testify")
@@ -73,7 +67,6 @@ func TestBuild(t *testing.T) {
 	pb.AddProgrammingLanguage("Go")
 	pb.AddProgrammingLanguageVersion("1.20")
 	pb.AddFrameworks("cobra")
-	pb.AddTestFramework("testify")
 	pb.AddTestDependencies("testify")
 	pb.AddDependencyManager("Go mod")
 	pb.AddCodeSnippet("func testFunc() {}")

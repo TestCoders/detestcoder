@@ -5,7 +5,6 @@ const (
 	ProgrammingLanguageVersion = ProgrammingLanguage + "_version"
 	DependencyManager          = "dependency_manager"
 	Frameworks                 = "frameworks"
-	TestFramework              = "test_framework"
 	TestDependencies           = "test_dependencies"
 	CodeSnippet                = "code_snippet"
 	CodeSnippetContext         = CodeSnippet + "_context"

@@ -27,7 +27,6 @@ func setup() {
 	ts.SetDependencyManager("Maven", "3")
 	ts.SetLanguage("Java", "20")
 	ts.SetFramework("Spring Boot", "3.0")
-	ts.SetTestFramework("jUnit", "5")
 	ts.AddTestDependency("AssertJ", "3.1.1")
 	ts.AddTestDependency("Spring Boot Test", "3")
 
@@ -63,28 +62,35 @@ func createTempDetestcoderProjectYaml(ts techstack.TechStack) {
 }
 
 func createTempDetestcoderYaml(am aimodel.AIModel) {
+	workingDir, err := os.Getwd()
+	cobra.CheckErr(err)
+
+	err = os.Setenv("HOME", workingDir)
+	if err != nil {
+		return
+	}
+
 	// Marshal the ts struct into YAML
 	bytes, err := yaml.Marshal(am)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 
-	homeDir, err := os.UserHomeDir()
-	cobra.CheckErr(err)
-
 	// Write the YAML to the .detestcoder file
-	err = os.WriteFile(homeDir+"/.detestcoder.yaml", bytes, 0644)
+	err = os.WriteFile(".detestcoder.yaml", bytes, 0644)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
 }
 
 func teardown() {
-	homeDir, err := os.UserHomeDir()
-	cobra.CheckErr(err)
-	err = os.Remove(homeDir + "/.detestcoder.yaml")
+	err := os.Remove(".detestcoder.yaml")
 	if err != nil {
 		log.Fatalf("Failed to remove .detestcoder.yaml: %v", err)
+	}
+	err = os.Unsetenv("HOME")
+	if err != nil {
+		return
 	}
 	err = os.Remove(".detestcoder.project.yaml")
 	if err != nil {

@@ -32,15 +32,6 @@ func TestSetFramework(t *testing.T) {
 	assert.Equal(t, "1.0", tStack.Framework.Version)
 }
 
-// Testing SetTestFramework function to ensure it correctly adds a new unit test framework with the name and version.
-func TestSetTestFramework(t *testing.T) {
-	tStack := NewTechStack()
-
-	tStack.SetTestFramework("testify", "1.7")
-	assert.Equal(t, "testify", tStack.TestFramework.Name)
-	assert.Equal(t, "1.7", tStack.TestFramework.Version)
-}
-
 // Testing AddTestDependency function to ensure it correctly adds a new unit test dependency with the name and version.
 func TestAddTestDependency(t *testing.T) {
 	tStack := NewTechStack()

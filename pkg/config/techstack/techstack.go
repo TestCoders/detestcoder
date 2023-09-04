@@ -18,10 +18,6 @@ type TechStack struct {
 		Name    string `yaml:"name"`
 		Version string `yaml:"version"`
 	} `yaml:"framework"`
-	TestFramework struct {
-		Name    string `yaml:"name"`
-		Version string `yaml:"version"`
-	} `yaml:"testframework"`
 	TestDependencies []struct {
 		Name    string `yaml:"name"`
 		Version string `yaml:"version"`
@@ -39,10 +35,6 @@ func NewTechStack() *TechStack {
 			Version string `yaml:"version"`
 		}{},
 		Framework: struct {
-			Name    string `yaml:"name"`
-			Version string `yaml:"version"`
-		}{},
-		TestFramework: struct {
 			Name    string `yaml:"name"`
 			Version string `yaml:"version"`
 		}{},
@@ -66,11 +58,6 @@ func (t *TechStack) SetLanguage(name string, version string) {
 func (t *TechStack) SetFramework(name string, version string) {
 	t.Framework.Name = name
 	t.Framework.Version = version
-}
-
-func (t *TechStack) SetTestFramework(name string, version string) {
-	t.TestFramework.Name = name
-	t.TestFramework.Version = version
 }
 
 func (t *TechStack) AddTestDependency(name string, version string) {
