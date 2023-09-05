@@ -7,8 +7,10 @@ import (
 
 type TechStack struct {
 	Language struct {
-		Name    string `yaml:"name"`
-		Version string `yaml:"version"`
+		Name            string `yaml:"name"`
+		Version         string `yaml:"version"`
+		Compiler        string `yaml:"compiler"`
+		CompilerVersion string `yaml:"compilerversion"`
 	} `yaml:"language"`
 	DependencyManager struct {
 		Name    string `yaml:"name"`
@@ -27,8 +29,10 @@ type TechStack struct {
 func NewTechStack() *TechStack {
 	return &TechStack{
 		Language: struct {
-			Name    string `yaml:"name"`
-			Version string `yaml:"version"`
+			Name            string `yaml:"name"`
+			Version         string `yaml:"version"`
+			Compiler        string `yaml:"compiler"`
+			CompilerVersion string `yaml:"compilerversion"`
 		}{},
 		DependencyManager: struct {
 			Name    string `yaml:"name"`
@@ -53,6 +57,11 @@ func (t *TechStack) SetDependencyManager(name string, version string) {
 func (t *TechStack) SetLanguage(name string, version string) {
 	t.Language.Name = name
 	t.Language.Version = version
+}
+
+func (t *TechStack) SetCompiler(name string, version string) {
+	t.Language.Compiler = name
+	t.Language.CompilerVersion = version
 }
 
 func (t *TechStack) SetFramework(name string, version string) {

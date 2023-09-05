@@ -21,7 +21,7 @@ var DependencyManager = map[string][]string{
 }
 
 var DependencyManagerFile = map[string][]string{
-	MAVEN:  {"pom.xml"},
+	MAVEN:  {"pom.pom"},
 	GRADLE: {"build.gradle", "build.gradle.kts"},
 	SDT:    {"build.sbt"},
 	PIP:    {"requirements.txt"},

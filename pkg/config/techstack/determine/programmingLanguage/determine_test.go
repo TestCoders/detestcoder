@@ -13,7 +13,7 @@ func setup(testfile string) {
 }
 
 func createTempTestfile(testfile string) {
-	content := []byte(`<xml></xml>`)
+	content := []byte(`<pom></pom>`)
 	err := os.WriteFile(testfile, content, 0644)
 	if err != nil {
 		log.Fatalf("Failed to create file: %s", err)
@@ -28,8 +28,8 @@ func teardown(testfile string) {
 }
 
 func TestGetProgrammingLanguages_Maven(t *testing.T) {
-	setup("pom.xml")
-	defer teardown("pom.xml")
+	setup("pom.pom")
+	defer teardown("pom.pom")
 
 	depman := GetDependencyManager()
 	pl := GetProgrammingLanguages(depman)

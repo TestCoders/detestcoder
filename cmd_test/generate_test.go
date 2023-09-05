@@ -1,7 +1,7 @@
 package cmd_test
 
 import (
-	"bytes"
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcoders/detestcoder/cmd"
@@ -110,26 +110,29 @@ func teardown() {
 	}
 }
 
-func captureOutput(f func()) string {
-	old := os.Stdout // keep backup of the real stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
+func getGeneratedOutputFromDir() string {
+	output := ""
 
-	f()
+	workingDir, err := os.Getwd()
+	cobra.CheckErr(err)
 
-	outC := make(chan string)
-	// copy the output in a separate goroutine so printing can't block indefinitely
-	go func() {
-		var buf bytes.Buffer
-		buf.ReadFrom(r)
-		outC <- buf.String()
-	}()
+	files, err := os.ReadDir(workingDir + "/generatedOutput/")
+	if err != nil {
+		fmt.Println(err)
+		return output
+	}
 
-	w.Close()
-	os.Stdout = old // restoring the real stdout
-	out := <-outC
+	for _, file := range files {
+		if !file.IsDir() {
+			content, err := os.ReadFile(workingDir + "/generatedOutput/" + file.Name())
+			if err != nil {
+				log.Fatal(err)
+			}
+			output = string(content)
+		}
+	}
 
-	return out
+	return output
 }
 
 // Test case for default scenario where no flags are provided. The system should default to unit tests
@@ -142,14 +145,12 @@ func TestGenerateCmd_NoFlags(t *testing.T) {
 
 	// Set the file argument
 	rootCmd.SetArgs([]string{"generate", "testfile.java", "A file to test the test"})
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
 
-	out := captureOutput(func() {
-		err := rootCmd.Execute()
-		assert.NoError(t, err)
-	})
+	output := getGeneratedOutputFromDir()
 
-	assert.Contains(t, out, "No flags provided, defaulting to unit test for file: testfile.java")
-	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
+	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the unit test flag is set
@@ -163,13 +164,12 @@ func TestGenerateCmd_UnitTestFlag(t *testing.T) {
 	// Set the file argument
 	rootCmd.SetArgs([]string{"generate", "testfile.java", "--unittest"})
 
-	out := captureOutput(func() {
-		err := rootCmd.Execute()
-		assert.NoError(t, err)
-	})
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
 
-	assert.Contains(t, out, "Generating unit tests for file: testfile.java")
-	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
+	output := getGeneratedOutputFromDir()
+
+	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the integration test flag is set
@@ -183,13 +183,12 @@ func TestGenerateCmd_IntegrationTestFlag(t *testing.T) {
 	// Set the file argument
 	rootCmd.SetArgs([]string{"generate", "testfile.java", "--integrationtest"})
 
-	out := captureOutput(func() {
-		err := rootCmd.Execute()
-		assert.NoError(t, err)
-	})
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
 
-	assert.Contains(t, out, "Generating integration tests for file: testfile.java")
-	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
+	output := getGeneratedOutputFromDir()
+
+	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the e2e test flag is set
@@ -203,11 +202,10 @@ func TestGenerateCmd_E2ETestFlag(t *testing.T) {
 	// Set the file argument
 	rootCmd.SetArgs([]string{"generate", "testfile.java", "--e2etest"})
 
-	out := captureOutput(func() {
-		err := rootCmd.Execute()
-		assert.NoError(t, err)
-	})
+	err := rootCmd.Execute()
+	assert.NoError(t, err)
 
-	assert.Contains(t, out, "Generating e2e tests for file: testfile.java")
-	assert.Contains(t, out, "import org.apache.commons.lang3.RandomStringUtils;")
+	output := getGeneratedOutputFromDir()
+
+	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
 }

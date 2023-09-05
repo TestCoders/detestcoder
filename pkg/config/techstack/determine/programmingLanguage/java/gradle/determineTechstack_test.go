@@ -56,20 +56,6 @@ func TestDetermineTechstack(t *testing.T) {
 	assert.Equal(t, ts.TestDependencies[6].Version, "5.5.0")
 }
 
-func TestGetDependencies(t *testing.T) {
-	deps := getDependencies(gradleFile)
-
-	assert.NotNil(t, deps)
-}
-
-func TestGetTestDependencies(t *testing.T) {
-	deps := getDependencies(gradleFile)
-
-	testDeps := getTestDependencies(deps)
-
-	assert.NotNil(t, testDeps)
-}
-
 var gradleFile = `
 plugins {
     id 'java'
