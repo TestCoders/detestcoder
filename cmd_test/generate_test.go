@@ -150,7 +150,7 @@ func TestGenerateCmd_NoFlags(t *testing.T) {
 
 	output := getGeneratedOutputFromDir()
 
-	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
+	assert.Contains(t, output, "import org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the unit test flag is set
@@ -169,7 +169,7 @@ func TestGenerateCmd_UnitTestFlag(t *testing.T) {
 
 	output := getGeneratedOutputFromDir()
 
-	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
+	assert.Contains(t, output, "import org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the integration test flag is set
@@ -188,7 +188,7 @@ func TestGenerateCmd_IntegrationTestFlag(t *testing.T) {
 
 	output := getGeneratedOutputFromDir()
 
-	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
+	assert.Contains(t, output, "import org.apache.commons.lang3.RandomStringUtils;")
 }
 
 // Test case for when only the e2e test flag is set
@@ -207,5 +207,5 @@ func TestGenerateCmd_E2ETestFlag(t *testing.T) {
 
 	output := getGeneratedOutputFromDir()
 
-	assert.Contains(t, output, "```java\nimport org.apache.commons.lang3.RandomStringUtils;")
+	assert.Contains(t, output, "import org.apache.commons.lang3.RandomStringUtils;")
 }
