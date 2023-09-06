@@ -28,8 +28,8 @@ func teardown(testfile string) {
 }
 
 func TestGetProgrammingLanguages_Maven(t *testing.T) {
-	setup("pom.pom")
-	defer teardown("pom.pom")
+	setup("pom.xml")
+	defer teardown("pom.xml")
 
 	depman := GetDependencyManager()
 	pl := GetProgrammingLanguages(depman)

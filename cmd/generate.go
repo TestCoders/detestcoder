@@ -56,19 +56,23 @@ var generateCmd = &cobra.Command{
 		pb.AddCodeSnippetContext(codeSnippetContext)
 
 		if cmd.Flags().NFlag() == 0 {
-			fmt.Printf("No flags provided, defaulting to unit test for file: %s\n", file)
+			s.Suffix = "No flags provided, defaulting to unit test for file: " + file
+			s.Start()
 			pb.AddKindOfTest(testType.UT)
 		} else {
 			if unitTest {
-				fmt.Printf("Generating unit tests for file: %s\n", file)
+				s.Suffix = "Generating unit tests for file: " + file
+				s.Start()
 				pb.AddKindOfTest(testType.UT)
 			}
 			if integrationTest {
-				fmt.Printf("Generating integration tests for file: %s\n", file)
+				s.Suffix = "Generating integration tests for file: " + file
+				s.Start()
 				pb.AddKindOfTest(testType.IT)
 			}
 			if e2eTest {
-				fmt.Printf("Generating e2e tests for file: %s\n", file)
+				s.Suffix = "Generating e2e tests for file: " + file
+				s.Start()
 				pb.AddKindOfTest(testType.E2E)
 			}
 		}
@@ -87,7 +91,6 @@ var generateCmd = &cobra.Command{
 			files.WritePromptToFile(prompt)
 		}
 
-		s.Start()
 		response, err := ai.SendPrompt(ai.NewService().GetService(prompt, *aiModel), *aiModel, verbose)
 		if err != nil {
 			panic(err)

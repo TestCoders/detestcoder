@@ -10,6 +10,7 @@ import (
 	"github.com/testcoders/detestcoder/pkg/config/techstack"
 	"github.com/testcoders/detestcoder/pkg/config/techstack/determine/programmingLanguage"
 	"github.com/testcoders/detestcoder/pkg/config/techstack/determine/programmingLanguage/java/gradle"
+	"github.com/testcoders/detestcoder/pkg/config/techstack/determine/programmingLanguage/java/maven"
 	"github.com/testcoders/detestcoder/pkg/constants/project"
 	"os"
 	"path"
@@ -188,6 +189,9 @@ func generateTechstackAutomatically(ts *techstack.TechStack) {
 		if language == project.JAVA || language == project.KOTLIN || language == project.SCALA {
 			if projectDependencyManager == project.GRADLE {
 				techStack := gradle.DetermineTechstack()
+				*ts = *techStack
+			} else if projectDependencyManager == project.MAVEN {
+				techStack := maven.DetermineTechstack()
 				*ts = *techStack
 			} else {
 				fmt.Println("This programming language is supported, but not this dependency manager.")

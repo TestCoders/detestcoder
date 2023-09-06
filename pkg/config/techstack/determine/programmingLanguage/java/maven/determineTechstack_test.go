@@ -35,9 +35,15 @@ func TestDetermineTechstack(t *testing.T) {
 
 	assert.NotNil(t, ts)
 	assert.Equal(t, ts.Language.Name, project.KOTLIN)
-	assert.Equal(t, ts.Language.Version, "11")
+	assert.Equal(t, ts.Language.Version, "1.9.10")
 	assert.Equal(t, ts.DependencyManager.Name, project.MAVEN)
 	assert.Equal(t, ts.DependencyManager.Version, "")
+	assert.Equal(t, ts.TestDependencies[0].Name, "assertj-core")
+	assert.Equal(t, ts.TestDependencies[0].Version, "3.24.2")
+	assert.Equal(t, ts.TestDependencies[1].Name, "spring-boot-starter-test")
+	assert.Equal(t, ts.TestDependencies[1].Version, "")
+	assert.Equal(t, ts.TestDependencies[2].Name, "kotlin-test")
+	assert.Equal(t, ts.TestDependencies[2].Version, "1.9.10")
 }
 
 var pomString = `<?pom version="1.0" encoding="UTF-8"?>

@@ -1,7 +1,6 @@
 package maven
 
 import (
-	"fmt"
 	"github.com/testcoders/detestcoder/pkg/config/techstack"
 	"github.com/testcoders/detestcoder/pkg/constants/project"
 	"github.com/testcoders/detestcoder/pkg/constants/project/java"
@@ -15,11 +14,10 @@ func DetermineTechstack() *techstack.TechStack {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(parsedPom)
 
 	ts := techstack.NewTechStack()
 
-	// TODO: Check if there is a parent pom or child pom(s)
+	// TODO: Check if there is a parent pom
 	dependencies := getDependencies(*parsedPom)
 
 	pl, plv, c, cv := determineLanguageAndVersion(parsedPom)
@@ -33,7 +31,7 @@ func DetermineTechstack() *techstack.TechStack {
 	testDependencies := getTestDependencies(dependencies)
 
 	for _, testDependency := range testDependencies {
-		ts.AddTestDependency(getTestDependency(testDependency))
+		ts.AddTestDependency(getTestDependency(parsedPom, testDependency))
 	}
 
 	return ts
@@ -49,10 +47,7 @@ func determineLanguageAndVersion(pom *gopom.Project) (string, string, string, st
 	compiler := ""
 	compilerVersion := ""
 
-	propMap := make(map[string]string)
-	for key, entry := range pom.Properties.Entries {
-		propMap[key] = entry
-	}
+	propMap := getProperties(pom)
 
 	if _, ok := propMap["kotlin.version"]; ok {
 		lang = project.KOTLIN
@@ -105,12 +100,25 @@ func getTestDependencies(dependencies *[]gopom.Dependency) []gopom.Dependency {
 	return testDeps
 }
 
-func getTestDependency(dependency gopom.Dependency) (string, string) {
+func getTestDependency(pom *gopom.Project, dependency gopom.Dependency) (string, string) {
 	version := ""
 
-	if dependency.Version != nil && *dependency.Version != "" {
+	if dependency.Version != nil && strings.Contains(*dependency.Version, "${") && strings.Contains(*dependency.Version, "}") {
+		version = strings.ReplaceAll(*dependency.Version, "${", "")
+		version = strings.ReplaceAll(version, "}", "")
+		propMap := getProperties(pom)
+		version = propMap[version]
+	} else if dependency.Version != nil && *dependency.Version != "" {
 		version = *dependency.Version
 	}
 
 	return *dependency.ArtifactID, version
+}
+
+func getProperties(pom *gopom.Project) map[string]string {
+	propMap := make(map[string]string)
+	for key, entry := range pom.Properties.Entries {
+		propMap[key] = entry
+	}
+	return propMap
 }
