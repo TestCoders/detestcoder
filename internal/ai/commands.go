@@ -5,8 +5,8 @@ import (
 )
 
 // SendPrompt is used to send the prompt to any AI backend and giving back a Response object
-func SendPrompt(service Service, model aimodel.AIModel) (*Response, error) {
-	raw, err := service.Send()
+func SendPrompt(service Service, model aimodel.AIModel, verbose bool) (*Response, error) {
+	raw, err := service.Send(verbose)
 	if err != nil {
 		return nil, err
 	}

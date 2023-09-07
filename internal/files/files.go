@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/testcoders/detestcoder/internal/ai"
+	"github.com/testcoders/detestcoder/pkg/constants/project"
 	"github.com/testcoders/detestcoder/pkg/promptbuilder"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -39,14 +41,25 @@ func WritePromptToFile(data string) {
 }
 
 func WriteOutputToFile(response ai.Response, testFileName string) {
-	timestamp := time.Now().Unix()
-
 	dir := "generatedOutput/"
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.Mkdir(dir, 0755)
 	}
 
-	filename := fmt.Sprintf("%soutput_%d", dir, timestamp)
+	testFileName = strings.ReplaceAll(testFileName, "../", "")
+	outputFile := strings.Split(testFileName, ".")
+
+	// get the base filename
+	baseFilename := filepath.Base(testFileName)
+	outputFileName := ""
+
+	if outputFile[1] == project.JAVA {
+		outputFileName = strings.TrimSuffix(baseFilename, filepath.Ext(baseFilename)) + "Test." + outputFile[1]
+	} else if outputFile[1] == project.KOTLIN {
+		outputFileName = strings.TrimSuffix(baseFilename, filepath.Ext(baseFilename)) + "Test." + outputFile[1]
+	}
+
+	filename := fmt.Sprintf("%s%s", dir, outputFileName)
 	file, err := os.Create(filename)
 	if err != nil {
 		log.Fatalf("Failed to create file: %v", err)
@@ -55,6 +68,9 @@ func WriteOutputToFile(response ai.Response, testFileName string) {
 
 	w := bufio.NewWriter(file)
 	content := response.Content
+	content = strings.ReplaceAll(content, "```"+outputFile[1], "")
+	content = strings.ReplaceAll(content, "```", "")
+	content = strings.TrimSpace(content)
 	if _, err := w.WriteString(content + "\n\n"); err != nil {
 		log.Fatalf("Failed to write to file: %v", err)
 	}

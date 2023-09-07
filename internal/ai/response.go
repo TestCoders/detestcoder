@@ -42,16 +42,18 @@ func (r *Response) GetResponse(raw []byte, model aimodel.AIModel) Response {
 		if err != nil {
 			return Response{}
 		}
-		r.Content = openaiResponse.Choices[0].Message.Content
 		r.Created = openaiResponse.Created
+		r.Content = openaiResponse.Choices[0].Message.Content
+		r.Role = openaiResponse.Choices[0].Message.Role
 	case "Mock":
 		openaiResponse := new(OpenAIResponse)
 		err := json.Unmarshal(raw, openaiResponse)
 		if err != nil {
 			return Response{}
 		}
-		r.Content = openaiResponse.Choices[0].Message.Content
 		r.Created = openaiResponse.Created
+		r.Content = openaiResponse.Choices[0].Message.Content
+		r.Role = openaiResponse.Choices[0].Message.Role
 	}
 	return Response{}
 }

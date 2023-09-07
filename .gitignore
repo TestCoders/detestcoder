@@ -29,6 +29,7 @@ testfiles
 main
 detestcoder
 .detestcoder.yaml
+.detestcoder.project.yaml
 
 # OS stuff
 .DS_Store

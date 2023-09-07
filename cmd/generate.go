@@ -2,19 +2,23 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 	"github.com/testcoders/detestcoder/internal/addproject"
 	"github.com/testcoders/detestcoder/internal/ai"
 	"github.com/testcoders/detestcoder/internal/files"
 	"github.com/testcoders/detestcoder/internal/initialize"
+	"github.com/testcoders/detestcoder/internal/misc"
 	"github.com/testcoders/detestcoder/pkg/config/techstack"
 	"github.com/testcoders/detestcoder/pkg/constants/testType"
 	"github.com/testcoders/detestcoder/pkg/promptbuilder"
+	"time"
 )
 
 var unitTest bool
 var integrationTest bool
 var e2eTest bool
+var verbose bool
 
 func NewGenerateCmd() *cobra.Command {
 	return generateCmd
@@ -26,6 +30,9 @@ var generateCmd = &cobra.Command{
 	Long:  `This command generates unit, integration, or e2e tests for a given file with a given context.`,
 	Args:  cobra.MaximumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+		s := spinner.New(misc.Detestcoder(), 100*time.Millisecond)
+		s.Color("blue")
+
 		file := args[0]
 
 		aiModel, err := initialize.ReadConfig()
@@ -49,19 +56,23 @@ var generateCmd = &cobra.Command{
 		pb.AddCodeSnippetContext(codeSnippetContext)
 
 		if cmd.Flags().NFlag() == 0 {
-			fmt.Printf("No flags provided, defaulting to unit test for file: %s\n", file)
+			s.Suffix = "No flags provided, defaulting to unit test for file: " + file
+			s.Start()
 			pb.AddKindOfTest(testType.UT)
 		} else {
 			if unitTest {
-				fmt.Printf("Generating unit tests for file: %s\n", file)
+				s.Suffix = "Generating unit tests for file: " + file
+				s.Start()
 				pb.AddKindOfTest(testType.UT)
 			}
 			if integrationTest {
-				fmt.Printf("Generating integration tests for file: %s\n", file)
+				s.Suffix = "Generating integration tests for file: " + file
+				s.Start()
 				pb.AddKindOfTest(testType.IT)
 			}
 			if e2eTest {
-				fmt.Printf("Generating e2e tests for file: %s\n", file)
+				s.Suffix = "Generating e2e tests for file: " + file
+				s.Start()
 				pb.AddKindOfTest(testType.E2E)
 			}
 		}
@@ -72,15 +83,24 @@ var generateCmd = &cobra.Command{
 		pb.AddProgrammingLanguageVersion(techStack.Language.Version)
 		pb.AddDependencyManager(techStack.DependencyManager.Name + " " + techStack.DependencyManager.Version)
 		pb.AddFrameworks(techStack.Framework.Name + " " + techStack.Framework.Version)
-		pb.AddTestFramework(techStack.TestFramework.Name + " " + techStack.TestFramework.Version)
 		pb.AddTestDependencies(techstack.GetTestDependencies(*techStack))
 
-		response, err := ai.SendPrompt(ai.NewService().GetService(pb.Build(), *aiModel), *aiModel)
+		prompt := pb.Build()
+
+		if verbose {
+			files.WritePromptToFile(prompt)
+		}
+
+		response, err := ai.SendPrompt(ai.NewService().GetService(prompt, *aiModel), *aiModel, verbose)
 		if err != nil {
 			panic(err)
 		}
+		s.Stop()
 
-		fmt.Println(response.Content)
+		if verbose {
+			fmt.Println(response.Content)
+		}
+
 		files.WriteOutputToFile(*response, file)
 	},
 }
@@ -89,6 +109,7 @@ func init() {
 	generateCmd.Flags().BoolVarP(&unitTest, "unittest", "u", false, "Generate unit tests")
 	generateCmd.Flags().BoolVarP(&integrationTest, "integrationtest", "i", false, "Generate integration tests")
 	generateCmd.Flags().BoolVarP(&e2eTest, "e2etest", "e", false, "Generate e2e tests")
+	generateCmd.Flags().BoolVarP(&verbose, "verbose", "v", false, "Verbose output")
 
 	rootCmd.AddCommand(generateCmd)
 }

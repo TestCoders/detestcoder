@@ -6,10 +6,12 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/testcoders/detestcoder/internal/initialize"
 	"github.com/testcoders/detestcoder/pkg/config"
-	"github.com/testcoders/detestcoder/pkg/config/aimodel"
 	"github.com/testcoders/detestcoder/pkg/config/techstack"
+	"github.com/testcoders/detestcoder/pkg/config/techstack/determine/programmingLanguage"
+	"github.com/testcoders/detestcoder/pkg/config/techstack/determine/programmingLanguage/java/gradle"
+	"github.com/testcoders/detestcoder/pkg/config/techstack/determine/programmingLanguage/java/maven"
+	"github.com/testcoders/detestcoder/pkg/constants/project"
 	"os"
 	"path"
 )
@@ -51,15 +53,12 @@ func WriteConfig() error {
 		}
 	}
 
-	aiModel, err := initialize.ReadConfig()
-	cobra.CheckErr(err)
-
 	techStack := techstack.NewTechStack()
 
 	workingDir, err := os.Getwd()
 	cobra.CheckErr(err)
 
-	getTechstackInput(techStack, aiModel)
+	getTechstackInput(techStack)
 
 	// Configure Viper
 	viper.AddConfigPath(workingDir)
@@ -67,7 +66,10 @@ func WriteConfig() error {
 	viper.SetConfigName(".detestcoder.project")
 
 	// Set initialize values
-	viper.Set("TechStack", techStack)
+	viper.Set("language", techStack.Language)
+	viper.Set("dependencymanager", techStack.DependencyManager)
+	viper.Set("framework", techStack.Framework)
+	viper.Set("testdependencies", techStack.TestDependencies)
 
 	cfgFile := path.Join(workingDir, ".detestcoder.project.yaml")
 
@@ -89,35 +91,35 @@ func WriteConfig() error {
 }
 
 // getTechstackInput uses an interactive prompt to retrieve settings input from the user
-func getTechstackInput(techstack *techstack.TechStack, aiModel *aimodel.AIModel) {
+func getTechstackInput(ts *techstack.TechStack) {
 	automaticSetupPrompt := config.ConfigPrompt{
-		Label:    fmt.Sprintf("Do you want to create the techstack automatically using '%v'? ", aiModel.AiModel),
+		Label:    "Do you want to create the techstack automatically? ",
 		ErrorMsg: "Select 'y' or 'n'.",
 	}
 	var automaticSetup = getUserInputSelect(automaticSetupPrompt, yn)
 
 	if automaticSetup == "n" {
-		generateTechstackManually(techstack)
+		generateTechstackManually(ts)
 	} else {
-		generateTechstackAutomatically(techstack)
+		generateTechstackAutomatically(ts)
 	}
 }
 
-func generateTechstackManually(techstack *techstack.TechStack) {
+func generateTechstackManually(ts *techstack.TechStack) {
 	// Programming language
 	programmingLanguagePrompt := config.ConfigPrompt{
 		Label:    "Which programming language is your project written in? ",
 		ErrorMsg: "Provide a programming language, like Java or Go",
 	}
-	programmingLanguage := getUserInputString(programmingLanguagePrompt, false, false)
+	projectProgrammingLanguage := getUserInputString(programmingLanguagePrompt, false, false)
 
 	programmingLanguageVersionPrompt := config.ConfigPrompt{
-		Label:    fmt.Sprintf("Which version of '%v' does your project use? ", programmingLanguage),
+		Label:    fmt.Sprintf("Which version of '%v' does your project use? ", projectProgrammingLanguage),
 		ErrorMsg: "Provide a programming language version.",
 	}
 	programmingLanguageVersion := getUserInputString(programmingLanguageVersionPrompt, false, false)
 
-	techstack.SetLanguage(programmingLanguage, programmingLanguageVersion)
+	ts.SetLanguage(projectProgrammingLanguage, programmingLanguageVersion)
 
 	// Dependency manager
 	dependencyManagerPrompt := config.ConfigPrompt{
@@ -132,7 +134,7 @@ func generateTechstackManually(techstack *techstack.TechStack) {
 	}
 	dependencyManagerVersion := getUserInputString(dependencyManagerVersionPrompt, false, false)
 
-	techstack.SetDependencyManager(dependencyManager, dependencyManagerVersion)
+	ts.SetDependencyManager(dependencyManager, dependencyManagerVersion)
 
 	// Framework
 	frameworkPrompt := config.ConfigPrompt{
@@ -147,22 +149,7 @@ func generateTechstackManually(techstack *techstack.TechStack) {
 	}
 	frameworkVersion := getUserInputString(frameworkVersionPrompt, false, false)
 
-	techstack.SetFramework(framework, frameworkVersion)
-
-	// Test framework
-	testFrameworkPrompt := config.ConfigPrompt{
-		Label:    "Which test framework does your project use? ",
-		ErrorMsg: "Provide a test framework, like Spring Boot",
-	}
-	testFramework := getUserInputString(testFrameworkPrompt, false, false)
-
-	testFrameworkVersionPrompt := config.ConfigPrompt{
-		Label:    fmt.Sprintf("Which version of '%v' does your project use? ", testFramework),
-		ErrorMsg: "Provide a framework version.",
-	}
-	testFrameworkVersion := getUserInputString(testFrameworkVersionPrompt, false, false)
-
-	techstack.SetTestFramework(testFramework, testFrameworkVersion)
+	ts.SetFramework(framework, frameworkVersion)
 
 	// Test dependencies
 	addTestDependenciesPrompt := config.ConfigPrompt{
@@ -184,7 +171,7 @@ func generateTechstackManually(techstack *techstack.TechStack) {
 		}
 		testDependencyVersion := getUserInputString(testDependencyVersionPrompt, false, false)
 
-		techstack.AddTestDependency(testDependency, testDependencyVersion)
+		ts.AddTestDependency(testDependency, testDependencyVersion)
 
 		moreToAddPrompt := config.ConfigPrompt{
 			Label:    "Do you want to add another test dependency? ",
@@ -194,8 +181,25 @@ func generateTechstackManually(techstack *techstack.TechStack) {
 	}
 }
 
-func generateTechstackAutomatically(techstack *techstack.TechStack) {
-	fmt.Println("Not yet implemented.")
+func generateTechstackAutomatically(ts *techstack.TechStack) {
+	projectDependencyManager := programmingLanguage.GetDependencyManager()
+	projectProgrammingLanguage := programmingLanguage.GetProgrammingLanguages(projectDependencyManager)
+
+	for _, language := range projectProgrammingLanguage {
+		if language == project.JAVA || language == project.KOTLIN || language == project.SCALA {
+			if projectDependencyManager == project.GRADLE {
+				techStack := gradle.DetermineTechstack()
+				*ts = *techStack
+			} else if projectDependencyManager == project.MAVEN {
+				techStack := maven.DetermineTechstack()
+				*ts = *techStack
+			} else {
+				fmt.Println("This programming language is supported, but not this dependency manager.")
+			}
+		} else {
+			fmt.Println("This programming language is not yet supported.")
+		}
+	}
 }
 
 // getUserInputSelect creates a prompt where the user can provide textual input.

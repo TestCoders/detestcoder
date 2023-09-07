@@ -35,7 +35,7 @@ type MockOpenAIService struct {
 
 // Service interface
 type Service interface {
-	Send() ([]byte, error)
+	Send(verbose bool) ([]byte, error)
 }
 
 type ServiceStore struct{}
@@ -86,7 +86,7 @@ type Prompt struct {
 	Stream      bool      `json:"stream"`
 }
 
-func (s *OpenAIService) Send() ([]byte, error) {
+func (s *OpenAIService) Send(verbose bool) ([]byte, error) {
 	openaiURL := "https://api.openai.com/v1/chat/completions"
 
 	promptStruct := &Prompt{
@@ -111,12 +111,14 @@ func (s *OpenAIService) Send() ([]byte, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", s.APIKey))
 
-	//Print request details
-	fmt.Printf("\nRequest details:\n")
-	fmt.Printf("Method: %v\n", req.Method)
-	fmt.Printf("URL: %v\n", req.URL)
-	fmt.Printf("Headers: %v\n", req.Header)
-	fmt.Printf("Body: %s\n", jsonPrompt)
+	if verbose {
+		//Print request details
+		fmt.Printf("\nRequest details:\n")
+		fmt.Printf("Method: %v\n", req.Method)
+		fmt.Printf("URL: %v\n", req.URL)
+		fmt.Printf("Headers: %v\n", req.Header)
+		fmt.Printf("Body: %s\n", jsonPrompt)
+	}
 
 	resp, err := s.Client.Do(req)
 	if err != nil {
@@ -131,16 +133,18 @@ func (s *OpenAIService) Send() ([]byte, error) {
 		return nil, err
 	}
 
-	//Print response details
-	fmt.Printf("\nResponse details:\n")
-	fmt.Printf("Status: %v\n", resp.Status)
-	fmt.Printf("Headers: %v\n", resp.Header)
-	fmt.Printf("Body: %s", body)
+	if verbose {
+		//Print response details
+		fmt.Printf("\nResponse details:\n")
+		fmt.Printf("Status: %v\n", resp.Status)
+		fmt.Printf("Headers: %v\n", resp.Header)
+		fmt.Printf("Body: %s", body)
+	}
 
 	return body, nil
 }
 
-func (s *MockOpenAIService) Send() ([]byte, error) {
+func (s *MockOpenAIService) Send(verbose bool) ([]byte, error) {
 	openAIURL := "https://api.openai.com/v1/chat/completions"
 
 	promptStruct := &Prompt{

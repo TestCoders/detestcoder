@@ -7,8 +7,10 @@ import (
 
 type TechStack struct {
 	Language struct {
-		Name    string `yaml:"name"`
-		Version string `yaml:"version"`
+		Name            string `yaml:"name"`
+		Version         string `yaml:"version"`
+		Compiler        string `yaml:"compiler"`
+		CompilerVersion string `yaml:"compilerversion"`
 	} `yaml:"language"`
 	DependencyManager struct {
 		Name    string `yaml:"name"`
@@ -18,10 +20,6 @@ type TechStack struct {
 		Name    string `yaml:"name"`
 		Version string `yaml:"version"`
 	} `yaml:"framework"`
-	TestFramework struct {
-		Name    string `yaml:"name"`
-		Version string `yaml:"version"`
-	} `yaml:"testframework"`
 	TestDependencies []struct {
 		Name    string `yaml:"name"`
 		Version string `yaml:"version"`
@@ -31,18 +29,16 @@ type TechStack struct {
 func NewTechStack() *TechStack {
 	return &TechStack{
 		Language: struct {
-			Name    string `yaml:"name"`
-			Version string `yaml:"version"`
+			Name            string `yaml:"name"`
+			Version         string `yaml:"version"`
+			Compiler        string `yaml:"compiler"`
+			CompilerVersion string `yaml:"compilerversion"`
 		}{},
 		DependencyManager: struct {
 			Name    string `yaml:"name"`
 			Version string `yaml:"version"`
 		}{},
 		Framework: struct {
-			Name    string `yaml:"name"`
-			Version string `yaml:"version"`
-		}{},
-		TestFramework: struct {
 			Name    string `yaml:"name"`
 			Version string `yaml:"version"`
 		}{},
@@ -63,14 +59,14 @@ func (t *TechStack) SetLanguage(name string, version string) {
 	t.Language.Version = version
 }
 
+func (t *TechStack) SetCompiler(name string, version string) {
+	t.Language.Compiler = name
+	t.Language.CompilerVersion = version
+}
+
 func (t *TechStack) SetFramework(name string, version string) {
 	t.Framework.Name = name
 	t.Framework.Version = version
-}
-
-func (t *TechStack) SetTestFramework(name string, version string) {
-	t.TestFramework.Name = name
-	t.TestFramework.Version = version
 }
 
 func (t *TechStack) AddTestDependency(name string, version string) {

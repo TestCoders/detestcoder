@@ -12,7 +12,7 @@ const basePrompt = "" +
 	"The code is written in {" + promptConstants.ProgrammingLanguage + "} with version {" + promptConstants.ProgrammingLanguageVersion + "}.\n\n" +
 	"It uses the following dependency manager (ignore this when empty): {" + promptConstants.DependencyManager + "}.\n\n" +
 	"It's built using the following frameworks: {" + promptConstants.Frameworks + "}\n\n" +
-	"It uses the following test frameworks \"{" + promptConstants.TestFramework + "}\" and dependencies \"{" + promptConstants.TestDependencies + "}\"\n\n" +
+	"It uses the following test dependencies \"{" + promptConstants.TestDependencies + "}\". Please make sure all imports are set correctly.\n\n" +
 	"Please provide only the test code without ``` without any explaining around it. \n\n" +
 	"Explain how you got to the test case using comments above each test function."
 
@@ -42,10 +42,6 @@ func (p *PromptBuilder) AddDependencyManager(value string) {
 
 func (p *PromptBuilder) AddFrameworks(value string) {
 	p.addVariable(promptConstants.Frameworks, value)
-}
-
-func (p *PromptBuilder) AddTestFramework(value string) {
-	p.addVariable(promptConstants.TestFramework, value)
 }
 
 func (p *PromptBuilder) AddTestDependencies(value string) {
